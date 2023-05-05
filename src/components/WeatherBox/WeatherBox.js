@@ -5,10 +5,12 @@ import { useCallback, useState } from 'react';
 
 const WeatherBox = props => {
   const [weather, setWeather] = useState();
+  const [pending, setPending] = useState(false);
 
   const handleCityChange = useCallback((city) => {
     const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=bcb95b3ec0a00f2407a89c48f97f490f&units=metric`;
 
+    setPending(true);
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
@@ -19,14 +21,15 @@ const WeatherBox = props => {
           description: data.weather[0].main,
         };
         setWeather(weatherData);
+        setPending(false);
       });
   });
 
   return (
     <section>
       <PickCity action={handleCityChange} />
-      <WeatherSummary {...weather} />
-      <Loader />
+      { (weather && !pending) && <WeatherSummary {...weather} /> }
+      { (pending && pending) && <Loader /> }
     </section>
   )
 };
